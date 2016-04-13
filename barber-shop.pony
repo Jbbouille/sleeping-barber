@@ -18,10 +18,9 @@ actor BarberShop
     end
 
   fun ref barber_occupied(customer: Customer, name: String) =>
-    _env.out.print("Barber: I am occupied "+name+" go in the waiting room.")
     if _waitingRoom.size() < 5 then
       _waitingRoom.push(customer)
-      _env.out.print(name+": I go in the waiting room, left space "+_waitingRoom.size().string()+".")
+      _env.out.print(name+": I go in the waiting room, left space "+(_waitingRoom.space()-_waitingRoom.size()).string()+".")
     else
       _env.out.print(name+": No more space in the waiting room, I leave the office!")
     end
@@ -30,7 +29,7 @@ actor BarberShop
     _env.out.print("Barber: I am gonna cut your hair "+name+"!")
     _chair = customer
     let timers = Timers
-    let timer = Timer(CuttingTime(_env, this, name), 20, 1000_000_000_000)
+    let timer = Timer(CuttingTime(this, name), 0, 3_000_000_000)
     timers(consume timer)
 
   be finish(name: String) =>
@@ -38,7 +37,7 @@ actor BarberShop
     _env.out.print("Barber: Finish to cut the hair to " + name)
     if _waitingRoom.size() > 0 then
       try
-        _waitingRoom.pop().cut_my_hair()
+        _waitingRoom.shift().cut_my_hair()
       end
     else
       _env.out.print("Barber: No more people in my office I go to sleep.")
